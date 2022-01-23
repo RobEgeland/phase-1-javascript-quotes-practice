@@ -6,30 +6,31 @@ let hiddenSubmit = document.querySelector('#hidden-submit')
 
 
 
-document.addEventListener('DOMContentLoaded', getQuote)
+document.addEventListener('DOMContentLoaded', getQuotes)
 
 
-function getQuote() {
+function getQuotes() {
     fetch('http://localhost:3000/quotes?_embed=likes')
     .then(res => res.json())
-    .then(data => data.forEach(data => renderQuote(data)))
+    .then(quotes => renderAllQuotes(quotes))
 }
 
 
-function renderQuote(data) {
-    let likes = 0
+function getSingleQuote(quoteData) {
+    let likes;
     //console.log(data)
-    debugger
-    fetch(`http://localhost:3000/likes?quoteId=${data.id}`)
+    //debugger
+    fetch(`http://localhost:3000/likes?quoteId=${quoteData.id}`)
     .then(res => res.json())
     .then(data => {
-        for (let like of data) {
-        console.log(like)
-        likes++
-        debugger
-    }})
-    
-    console.log(likes)
+        console.log("data", data)
+        likes = data.length
+        renderQuote(quoteData, likes)
+    })}
+
+function renderQuote(data, likes) {
+    console.log("like", likes)
+    console.log('data', data)
     let quote = document.createElement('li')
     quote.id = data.id
     quote.innerHTML = `
@@ -55,7 +56,10 @@ function renderQuote(data) {
     
 }
 
+function renderAllQuotes(quotes) {
+    quotes.forEach(getSingleQuote)
 
+}
 
 form.addEventListener('submit', createQuote)
 
@@ -108,12 +112,6 @@ function addLike(quote) {
         body: JSON.stringify({'quoteId': id})
     })
 
-    // fetch(`http://localhost:3000/likes?quoteId=${quote.id}`)
-    // .then(res => res.json())
-    // .then(data => {
-    //     data.forEach(() => likeNum.textContent++)
-    // })
-
 }
 
 
@@ -134,4 +132,5 @@ function saveQuote(e) {
         },
         body: JSON.stringify({'quote': e.target.hiddenText.value})
     })
+    renderAllQuotes
 }
