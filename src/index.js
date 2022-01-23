@@ -13,18 +13,21 @@ function getQuote() {
     fetch('http://localhost:3000/quotes?_embed=likes')
     .then(res => res.json())
     .then(data => data.forEach(data => renderQuote(data)))
-    //.then(data => grabLikes(data))
 }
 
 
-let likes = 0
 function renderQuote(data) {
+    let likes = 0
     //console.log(data)
-
+    debugger
     fetch(`http://localhost:3000/likes?quoteId=${data.id}`)
     .then(res => res.json())
-    .then(data => (data.likes))
-
+    .then(data => {
+        for (let like of data) {
+        console.log(like)
+        likes++
+        debugger
+    }})
     
     console.log(likes)
     let quote = document.createElement('li')
@@ -105,12 +108,11 @@ function addLike(quote) {
         body: JSON.stringify({'quoteId': id})
     })
 
-    console.log(quote)
-    fetch(`http://localhost:3000/likes?quoteId=${quote.id}`)
-    .then(res => res.json())
-    .then(data => {
-        data.forEach(() => likeNum.textContent++)
-    })
+    // fetch(`http://localhost:3000/likes?quoteId=${quote.id}`)
+    // .then(res => res.json())
+    // .then(data => {
+    //     data.forEach(() => likeNum.textContent++)
+    // })
 
 }
 
