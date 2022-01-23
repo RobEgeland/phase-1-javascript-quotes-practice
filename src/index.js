@@ -3,6 +3,7 @@ let form = document.querySelector('#new-quote-form');
 let hiddenForm = document.querySelector('#hidden-form')
 let hiddenText = document.querySelector('#hiddenText');
 let hiddenSubmit = document.querySelector('#hidden-submit')
+let sortButton = document.createElement('button')
 
 
 
@@ -17,21 +18,19 @@ function getQuotes() {
 
 
 function getSingleQuote(quoteData) {
+    quoteList.innerHTML = ''
     let likes;
-    //console.log(data)
-    //debugger
     fetch(`http://localhost:3000/likes?quoteId=${quoteData.id}`)
     .then(res => res.json())
     .then(data => {
-        console.log("data", data)
         likes = data.length
         renderQuote(quoteData, likes)
     })}
 
 function renderQuote(data, likes) {
-    console.log("like", likes)
-    console.log('data', data)
-    let quote = document.createElement('li')
+    sortButton.id = 'btn-sort'
+    sortButton.textContent = 'Sort'
+    quote = document.createElement('li')
     quote.id = data.id
     quote.innerHTML = `
     <blockquote class="blockquote">
@@ -45,8 +44,8 @@ function renderQuote(data, likes) {
     `
     
     quoteList.appendChild(quote)
+    quoteList.appendChild(sortButton)
     
-    console.log()
     quote.querySelector('.btn-danger').addEventListener('click', () => {
         quote.remove()
         deleteQuote(quote.id)
@@ -96,8 +95,6 @@ function deleteQuote(id) {
 
 
 
-
-
 function addLike(quote) {
     let likeNum = quote.querySelector('span')
     likeNum.textContent++
@@ -134,3 +131,26 @@ function saveQuote(e) {
     })
     renderAllQuotes
 }
+
+sortButton.addEventListener('click', getSortedQuotes)
+
+
+function getSortedQuotes() {
+    fetch('http://localhost:3000/quotes?_embed=likes')
+    .then(res => res.json())
+    .then(quotes => sortQuotes(quotes))
+}
+
+function sortQuotes(quotes) {
+    function SortArray(x, y){
+        if (x.author < y.author) {return -1;}
+        if (x.author > y.author) {return 1;}
+        return 0;
+    }
+    let sort = quotes.sort(SortArray)
+    sort.forEach(getSingleQuote)
+
+}
+
+
+
